@@ -24,7 +24,7 @@ public class ExternalMultiwayMerge {
 
 	public void readAndSplit(String filePath, int M) {
 
-		EtmPoint point = MONITOR.createPoint("ExternalMergeSort:readAndSplit");
+		EtmPoint point = MONITOR.createPoint("2.ExternalMergeSort:readAndSplit");
 
 		Input input = new Input(filePath);
 		List<Integer> integers = new ArrayList<Integer>();
@@ -42,7 +42,7 @@ public class ExternalMultiwayMerge {
 				integers.add(value);
 				// check whether main memory capacity has been reached
 				if (integers.size() == M) {
-					EtmPoint pointW = MONITOR.createPoint("xternalMergeSort:writeToDisk_initial_stream");
+					EtmPoint pointW = MONITOR.createPoint("4.ExternalMergeSort:writeToDisk_initial_stream");
 					writeToDisk(integers, "initial_stream");
 					pointW.collect();
 					integers.clear();
@@ -50,7 +50,7 @@ public class ExternalMultiwayMerge {
 			}
 
 			if (!integers.isEmpty()) {
-				EtmPoint pointW = MONITOR.createPoint("xternalMergeSort:writeToDisk_initial_stream");
+				EtmPoint pointW = MONITOR.createPoint("4.ExternalMergeSort:writeToDisk_initial_stream");
 				writeToDisk(integers, "initial_stream");
 				pointW.collect();
 				integers.clear();
@@ -68,8 +68,10 @@ public class ExternalMultiwayMerge {
 		// set the file name
 		String filePath = outputFolder + type + streamNo + ".txt";
 
+		EtmPoint point = MONITOR.createPoint("7.ExternalMergeSort:builtIn_stream_mergesort");
 		// sort the stream
 		Collections.sort(integers);
+		point.collect();
 
 		// write the data to a file
 		Output output = new Output(filePath);
@@ -102,8 +104,10 @@ public class ExternalMultiwayMerge {
 		}
 
 		// Merge the d streams
+		EtmPoint pointM = MONITOR.createPoint("6.ExternalMergeSort:multiway_merge");
 		MultiwayMerge multiwayMerge = new MultiwayMerge(25);
 		List<Integer> mergedStream = multiwayMerge.sort(inputStreams);
+		pointM.collect();
 
 		// UNCOMMENT to print the mergedstream
 		/*
@@ -113,7 +117,7 @@ public class ExternalMultiwayMerge {
 		 */
 
 		// Write the result stream to disk
-		EtmPoint pointW = MONITOR.createPoint("xternalMergeSort:writeToDisk_merged_stream");
+		EtmPoint pointW = MONITOR.createPoint("5.ExternalMergeSort:writeToDisk_merged_stream");
 		writeToDisk(mergedStream, "merged_stream");
 		pointW.collect();
 
@@ -151,10 +155,13 @@ public class ExternalMultiwayMerge {
 
 	public void sort(String filePath, int M, int d) {
 		
-		EtmPoint point = MONITOR.createPoint("ExxternalMergeSort:sort");
+		EtmPoint point = MONITOR.createPoint("1.ExternalMergeSort:sort_input");
 		
 		readAndSplit(filePath, M);
+		
+		EtmPoint pointM = MONITOR.createPoint("3.ExternalMergeSort:merge_sorted_streams");
 		mergeStreams(d);
+		pointM.collect();
 		
 		 point.collect();
 	}
