@@ -10,6 +10,8 @@ import etm.core.renderer.SimpleTextRenderer;
 public class Main {
 
 	private static EtmMonitor monitor;
+	// CHECK THE FILE LOCATION AND NAME BEFORE EXECUTING
+	private static String inputFile = "C:/Users/Juan/Documents/IT4BI/ULB/Database Systems Architecture/Project/test/sample.txt";
 	private final static int M = 10000;
 	private final static int d = 50;
 
@@ -19,7 +21,7 @@ public class Main {
 		setup();
 
 		ExternalMultiwayMerge merge = new ExternalMultiwayMerge();
-		merge.sort("C:/Users/Juan/Documents/IT4BI/ULB/Database Systems Architecture/Project/test/sample.txt", M, d);
+		merge.sort(inputFile, M, d);
 		
 		// visualize results
 	   monitor.render(new SimpleTextRenderer());
