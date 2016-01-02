@@ -11,14 +11,20 @@ import java.util.List;
 import java.util.Queue;
 
 import be.ulb.dsa.multiwaymerge.MultiwayMerge;
+import etm.core.configuration.EtmManager;
+import etm.core.monitor.EtmMonitor;
+import etm.core.monitor.EtmPoint;
 
 public class ExternalMultiwayMerge {
 
+	private static final EtmMonitor MONITOR = EtmManager.getEtmMonitor();
 	public Queue<String> streamReferences = new LinkedList<String>();
 	String outputFolder = "C:/Users/Juan/Documents/IT4BI/ULB/Database Systems Architecture/Project/test/";
-	int streamNo = 0;
+	private int streamNo = 1;
 
 	public void readAndSplit(String filePath, int M) {
+
+		EtmPoint point = MONITOR.createPoint("ExternalMergeSort:readAndSplit");
 
 		Input input = new Input(filePath);
 		List<Integer> integers = new ArrayList<Integer>();
@@ -36,18 +42,26 @@ public class ExternalMultiwayMerge {
 				integers.add(value);
 				// check whether main memory capacity has been reached
 				if (integers.size() == M) {
-					writeToDisk(integers, "stream");
+					EtmPoint pointW = MONITOR.createPoint("xternalMergeSort:writeToDisk_initial_stream");
+					writeToDisk(integers, "initial_stream");
+					pointW.collect();
 					integers.clear();
 				}
 			}
 
 			if (!integers.isEmpty()) {
-				writeToDisk(integers, "stream");
+				EtmPoint pointW = MONITOR.createPoint("xternalMergeSort:writeToDisk_initial_stream");
+				writeToDisk(integers, "initial_stream");
+				pointW.collect();
 				integers.clear();
 			}
+			
+			streamNo = 1;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		point.collect();
 	}
 
 	public void writeToDisk(List<Integer> integers, String type) {
@@ -75,12 +89,12 @@ public class ExternalMultiwayMerge {
 
 	public void mergeStreams(int d) {
 
-		//Check whether d is a valid number
+		// Check whether d is a valid number
 		if (d > streamReferences.size()) {
 			d = streamReferences.size();
 		}
 		List<List<Integer>> inputStreams = new ArrayList<List<Integer>>();
-		
+
 		// Load in memory the d first streams
 		for (int i = 0; i < d; i++) {
 			List<Integer> integers = loadStream(streamReferences.poll());
@@ -92,20 +106,23 @@ public class ExternalMultiwayMerge {
 		List<Integer> mergedStream = multiwayMerge.sort(inputStreams);
 
 		// Uncomment to print the mergedstream
-		/*System.out.println("OUTPUT");
-		for (int i = 0; i < mergedStream.size(); i++) {
-			System.out.println(mergedStream.get(i));
-		}*/
+		/*
+		 * System.out.println("OUTPUT"); for (int i = 0; i <
+		 * mergedStream.size(); i++) { System.out.println(mergedStream.get(i));
+		 * }
+		 */
 
 		// Write the result stream to disk
-		writeToDisk(mergedStream, "output");
+		EtmPoint pointW = MONITOR.createPoint("xternalMergeSort:writeToDisk_merged_stream");
+		writeToDisk(mergedStream, "merged_stream");
+		pointW.collect();
 
 		// if necessary, merge the next d streams
 		// stop condition
 		if (streamReferences.size() != 1) {
 			mergeStreams(d);
 		} else {
-			//write the plain numbers to a file
+			// write the plain numbers to a file
 			writeNumbers(mergedStream);
 			return;
 		}
@@ -133,11 +150,16 @@ public class ExternalMultiwayMerge {
 	}
 
 	public void sort(String filePath, int M, int d) {
+		
+		EtmPoint point = MONITOR.createPoint("ExxternalMergeSort:sort");
+		
 		readAndSplit(filePath, M);
 		mergeStreams(d);
+		
+		 point.collect();
 	}
-	
-	//Complementary method to write the numbers in plain text
+
+	// Complementary method to write the numbers in plain text
 	public void writeNumbers(List<Integer> integers) {
 		String filePath = outputFolder + "SortedNumbers.txt";
 		try {
