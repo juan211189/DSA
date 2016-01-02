@@ -105,7 +105,7 @@ public class ExternalMultiwayMerge {
 		MultiwayMerge multiwayMerge = new MultiwayMerge(25);
 		List<Integer> mergedStream = multiwayMerge.sort(inputStreams);
 
-		// Uncomment to print the mergedstream
+		// UNCOMMENT to print the mergedstream
 		/*
 		 * System.out.println("OUTPUT"); for (int i = 0; i <
 		 * mergedStream.size(); i++) { System.out.println(mergedStream.get(i));
@@ -122,8 +122,8 @@ public class ExternalMultiwayMerge {
 		if (streamReferences.size() != 1) {
 			mergeStreams(d);
 		} else {
-			// write the plain numbers to a file
-			writeNumbers(mergedStream);
+			// UNCOMMENT to write the plain numbers to a file. This will affect execution time
+			//writeNumbers(mergedStream);
 			return;
 		}
 	}
