@@ -10,6 +10,8 @@ import etm.core.renderer.SimpleTextRenderer;
 public class Main {
 
 	private static EtmMonitor monitor;
+	private final static int M = 10000;
+	private final static int d = 50;
 
 	public static void main(String[] args) throws IOException {
 		//Utilities.GenerateInputData();
@@ -17,7 +19,7 @@ public class Main {
 		setup();
 
 		ExternalMultiwayMerge merge = new ExternalMultiwayMerge();
-		merge.sort("C:/Users/Juan/Documents/IT4BI/ULB/Database Systems Architecture/Project/test/sample.txt", 10000, 50);
+		merge.sort("C:/Users/Juan/Documents/IT4BI/ULB/Database Systems Architecture/Project/test/sample.txt", M, d);
 		
 		// visualize results
 	   monitor.render(new SimpleTextRenderer());
