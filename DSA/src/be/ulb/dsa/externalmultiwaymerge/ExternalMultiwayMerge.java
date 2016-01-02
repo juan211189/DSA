@@ -36,14 +36,12 @@ public class ExternalMultiwayMerge {
 				integers.add(value);
 				// check whether main memory capacity has been reached
 				if (integers.size() == M) {
-					// System.out.println("stream" + streamNo + ".txt");
 					writeToDisk(integers, "stream");
 					integers.clear();
 				}
 			}
 
 			if (!integers.isEmpty()) {
-				// System.out.println("stream" + streamNo + ".txt");
 				writeToDisk(integers, "stream");
 				integers.clear();
 			}
@@ -93,10 +91,11 @@ public class ExternalMultiwayMerge {
 		MultiwayMerge multiwayMerge = new MultiwayMerge(25);
 		List<Integer> mergedStream = multiwayMerge.sort(inputStreams);
 
-		System.out.println("OUTPUT");
+		// Uncomment to print the mergedstream
+		/*System.out.println("OUTPUT");
 		for (int i = 0; i < mergedStream.size(); i++) {
 			System.out.println(mergedStream.get(i));
-		}
+		}*/
 
 		// Write the result stream to disk
 		writeToDisk(mergedStream, "output");
