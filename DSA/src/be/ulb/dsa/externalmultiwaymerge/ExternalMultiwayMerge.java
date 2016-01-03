@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import be.ulb.dsa.multiwaymerge.MultiwayMerge;
 import etm.core.configuration.EtmManager;
 import etm.core.monitor.EtmMonitor;
 import etm.core.monitor.EtmPoint;
@@ -21,12 +20,13 @@ public class ExternalMultiwayMerge {
 	public Queue<String> streamReferences = new LinkedList<String>();
 	String outputFolder = "C:/Users/Juan/Documents/IT4BI/ULB/Database Systems Architecture/Project/test/";
 	private int streamNo = 1;
+	private final int BUFFERSIZE = 1024;
 
 	public void readAndSplit(String filePath, int M) {
 
 		EtmPoint point = MONITOR.createPoint("2.ExternalMergeSort:readAndSplit");
 
-		Input input = new Input(filePath);
+		Input input = new Input(filePath, BUFFERSIZE);
 		List<Integer> integers = new ArrayList<Integer>();
 
 		try {
@@ -74,7 +74,7 @@ public class ExternalMultiwayMerge {
 		point.collect();
 
 		// write the data to a file
-		Output output = new Output(filePath);
+		Output output = new Output(filePath, BUFFERSIZE);
 		try {
 			for (int i = 0; i < integers.size(); i++) {
 				output.write(integers.get(i));
@@ -133,7 +133,7 @@ public class ExternalMultiwayMerge {
 	}
 
 	public List<Integer> loadStream(String filePath) {
-		Input input = new Input(filePath);
+		Input input = new Input(filePath, BUFFERSIZE);
 		List<Integer> integers = new ArrayList<Integer>();
 
 		try {
