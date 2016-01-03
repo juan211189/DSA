@@ -20,8 +20,11 @@ public class ExternalMultiwayMerge {
 	public Queue<String> streamReferences = new LinkedList<String>();
 	String outputFolder = "C:/Users/Juan/Documents/IT4BI/ULB/Database Systems Architecture/Project/test/";
 	private int streamNo = 1;
-	private final int BUFFERSIZE = 1024;
+	private final int BUFFERSIZE = 4 * 1024;
 
+	/* This method reads the input file according to the memory available (M),
+	 * every M values of the file are stored in a single txt file.
+	 * */
 	public void readAndSplit(String filePath, int M) {
 
 		EtmPoint point = MONITOR.createPoint("2.ExternalMergeSort:readAndSplit");
@@ -55,7 +58,7 @@ public class ExternalMultiwayMerge {
 				pointW.collect();
 				integers.clear();
 			}
-			
+
 			streamNo = 1;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -64,14 +67,19 @@ public class ExternalMultiwayMerge {
 		point.collect();
 	}
 
+	/* This method writes a stream into a txt file. If the stream comes from the unsorted input,
+	 * then the stream is sorted before being written. Every file location is stored in a queue.
+	*/
 	public void writeToDisk(List<Integer> integers, String type) {
 		// set the file name
 		String filePath = outputFolder + type + streamNo + ".txt";
 
-		EtmPoint point = MONITOR.createPoint("7.ExternalMergeSort:builtIn_stream_mergesort");
-		// sort the stream
-		Collections.sort(integers);
-		point.collect();
+		if (type.equals("initial_stream")) {
+			EtmPoint point = MONITOR.createPoint("7.ExternalMergeSort:builtIn_stream_mergesort");
+			// sort the stream
+			Collections.sort(integers);
+			point.collect();
+		}
 
 		// write the data to a file
 		Output output = new Output(filePath, BUFFERSIZE);
@@ -89,6 +97,8 @@ public class ExternalMultiwayMerge {
 		streamNo++;
 	}
 
+	/* This method sorts a given d amount of streams by using the multiway merge sort implementation
+	 * */
 	public void mergeStreams(int d) {
 
 		// Check whether d is a valid number
@@ -126,12 +136,14 @@ public class ExternalMultiwayMerge {
 		if (streamReferences.size() != 1) {
 			mergeStreams(d);
 		} else {
-			// UNCOMMENT to write the plain numbers to a file. This will affect execution time
+			// UNCOMMENT to write the plain numbers to a file. This will affect
+			// execution time
 			//writeNumbers(mergedStream);
 			return;
 		}
 	}
 
+	// Loads the data in a txt file into memory, the data is stored in an ArrayList
 	public List<Integer> loadStream(String filePath) {
 		Input input = new Input(filePath, BUFFERSIZE);
 		List<Integer> integers = new ArrayList<Integer>();
@@ -153,17 +165,18 @@ public class ExternalMultiwayMerge {
 		return integers;
 	}
 
+	//Innitiates the sorting process
 	public void sort(String filePath, int M, int d) {
-		
+
 		EtmPoint point = MONITOR.createPoint("1.ExternalMergeSort:sort_input");
-		
+
 		readAndSplit(filePath, M);
-		
+
 		EtmPoint pointM = MONITOR.createPoint("3.ExternalMergeSort:merge_sorted_streams");
 		mergeStreams(d);
 		pointM.collect();
-		
-		 point.collect();
+
+		point.collect();
 	}
 
 	// Complementary method to write the numbers in plain text
